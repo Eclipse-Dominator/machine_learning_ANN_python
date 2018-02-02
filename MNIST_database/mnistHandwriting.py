@@ -38,11 +38,11 @@ from struct import *
 # train as long to start getting good results.
 def MNISTexample(startN,howMany,bTrain=True,only01=False):
     if bTrain:
-        fImages = open('MNIST_database/train-images.idx3-ubyte','rb')
-        fLabels = open('MNIST_database/train-labels.idx1-ubyte','rb')
+        fImages = open('train-images.idx3-ubyte','rb')
+        fLabels = open('train-labels.idx1-ubyte','rb')
     else:
-        fImages = open('MNIST_database/t10k-images.idx3-ubyte','rb')
-        fLabels = open('MNIST_database/t10k-labels.idx1-ubyte','rb')
+        fImages = open('t10k-images.idx3-ubyte','rb')
+        fLabels = open('t10k-labels.idx1-ubyte','rb')
 
     # read the header information in the images file.
     s1, s2, s3, s4 = fImages.read(4), fImages.read(4), fImages.read(4), fImages.read(4)
