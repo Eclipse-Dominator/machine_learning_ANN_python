@@ -1,7 +1,6 @@
 import numpy as np
 # Artificial Neural Network
-class ANN(object):
-
+class ANN:
 	def __init__(self, layer_size_list):
 		self.input_size = layer_size_list[0]
 		self.hidden_output_layer = []
@@ -63,7 +62,7 @@ class ANN(object):
 	def sigmoid(self, x): return 1/(1+np.exp(-x))
 	def de_sigmoid(self, x): return self.sigmoid(x) * ( 1 - self.sigmoid(x) )
 
-class NNlayer(object):
+class NNlayer:
 	def __init__(self, previous_nodes, current_nodes, activating_function, derivative_function):
 		self.weightArr = np.random.random((previous_nodes,current_nodes))*2-1
 		self.biasArr = np.random.random((1,current_nodes))*2-1
