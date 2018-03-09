@@ -15,44 +15,42 @@ class ANN:
 			previous_output = layer.CalculateOutput(previous_output,save_data = save_result)
 		return previous_output
 
-	def mini_batch_training(self, training_data, batch_size, learning_rate = 0.3,iterations = 10):  # batch_size should be in integer 
+	def mini_batch_training(self, training_data, batch_size, learning_rate = 0.3, total_epoch = 500):  # batch_size should be in integer 
 		total_num_training_data = len(training_data)
-		total_epoch = total_num_training_data // batch_size
+		total_iterations = total_num_training_data // batch_size
 		np.random.shuffle(training_data)
-		for i in range(total_epoch):
-			index = batch_size * i
-			success_rate = self.batch_SGD(training_data[index:index+batch_size],learning_rate,maxiter = iterations)
-			if i%10 == 0:
-				print("epoch:", i+1, "out of", total_epoch,"| Accuracy:", success_rate)
+		for z in range(total_epoch):
+			success_total = 0
+			cost_total = 0
+			temp_batch = 0
+			for i in range(total_iterations):
+				index = batch_size * i
+				success, cost = self.batch_SGD(training_data[index:index+batch_size],learning_rate)
+				temp_batch = len(training_data[index:index+batch_size])
+				success_total += success
+				cost_total += cost
+			self.cost_result.append( cost_total/(temp_batch*total_iterations) )
+			self.accuracy_result.append( success_total/(temp_batch*total_iterations) )	
+			print("epoch:", z+1, "out of", total_epoch,"| Accuracy:", success_total/(temp_batch*total_iterations))
 
-	def batch_SGD(self,training_data,learning_rate,maxiter = 10,gradient_threshold = 1.0E-8):
+
+	def batch_SGD(self,training_data,learning_rate):
 		batch_size = len(training_data)
-		iterations = 0
 		correct = 0.0
-		total = 0.0
 		costTot = 0.0
-		while(iterations<=maxiter):
-			for data in training_data:
-				total += 1.0
-				network_result = self.propagate_result(data[0],save_result = True)
-				if np.argmax(network_result) == np.argmax(data[1]):
-					correct += 1.0
-				d_cost = network_result - [data[1]]
-				costTot+=0.5 * np.sum( (d_cost)**2 )
-				self.backpropagate_result(d_cost)	
-			gradient = self.update_layers(batch_size, learning_rate)
-			if gradient <= gradient_threshold:
-				break
-			iterations += 1
-		self.cost_result.append( costTot/total )
-		self.accuracy_result.append( correct/total )
-		return correct/total
+		for data in training_data:
+			network_result = self.propagate_result(data[0],save_result = True)
+			if np.argmax(network_result) == np.argmax(data[1]):
+				correct += 1.0
+			d_cost = network_result - [data[1]]
+			costTot+=0.5 * np.sum( (d_cost)**2 )
+			self.backpropagate_result(d_cost)
+		self.update_layers(batch_size, learning_rate)
+		return correct, costTot
 
 	def update_layers(self, batch_size, learning_rate):
-		gradient_magnitude = 0
 		for layer in self.hidden_output_layer:
-			gradient_magnitude += layer.update_constants(learning_rate, batch_size)
-		return gradient_magnitude
+			layer.update_constants(learning_rate, batch_size)
 
 	def backpropagate_result(self, d_cost):
 		final_derivative = d_cost
